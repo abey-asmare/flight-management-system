@@ -13,7 +13,7 @@ Chart Generation: The system provides functionality to generate charts based on 
 1. Clone the repository to your local machine:
 
 ```commandline
-git clone https://github.com/abeyasmare/flight-management-system.git
+git clone https://github.com/abey-asmare/flight-management-system.git
 ```
 
 2. Navigate to the project directory:

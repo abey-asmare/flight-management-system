@@ -95,6 +95,8 @@ class Randomly:
 
     def _generate_destination(self):
         destination: dict = random.choice(self._airport_codes[self.flight_type])
+        if destination is self._airport_codes['local'][0]:
+            return self._generate_destination()
         return list(destination.keys())[0] #dict
 
     @classmethod
@@ -196,6 +198,5 @@ class Randomly:
     @origin.setter
     def origin(self, value):
         self._origin = value
-
 
 

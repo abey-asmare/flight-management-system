@@ -7,16 +7,38 @@ import flet as ft
 from FlightCard import FlightCard, DLL
 from randomVariables import Randomly
 import graphs
-
+from time import sleep
+from user import User
 ACTIVE_FLIGHTS_DLL = DLL()
 CANCELED_FLIGHTS_DLL = DLL()
 FLOWN_FLIGHTS_DLL = DLL()
 
-def main(page):
+def main(page:ft.Page):
+
+    user = User.retrieve()
+    #--------------- LOADING UNTIL WE GET THE NECCESSARY DATA---------------
+    pb = ft.ProgressBar()
+
+    page.add(pb)
+
+    for i in range(0, 20):
+        sleep(0.1)
+        page.update()
+
+    #--------------- END LOAD ----------------------------------------------
+
+
     def handle_refresh_page(e):
         active_flight_cards.controls.clear()
         flown_flight_cards.controls.clear()
         canceled_flight_cards.controls.clear()
+        active_flight_cards.controls.append(
+            ft.Text("Active Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+        flown_flight_cards.controls.append(
+            ft.Text("Successful Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+        canceled_flight_cards.controls.append(
+            ft.Text("Cancelled Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+
         for flight_card in ACTIVE_FLIGHTS_DLL:
             flight_card.changeEditable()
             active_flight_cards.controls.append(flight_card.flight_as_card)
@@ -37,6 +59,14 @@ def main(page):
         active_flight_cards.controls.clear()
         flown_flight_cards.controls.clear()
         canceled_flight_cards.controls.clear()
+
+        active_flight_cards.controls.append(
+            ft.Text("Active Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+        flown_flight_cards.controls.append(
+            ft.Text("Successful Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+        canceled_flight_cards.controls.append(
+            ft.Text("Cancelled Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+
         for flight_card in ACTIVE_FLIGHTS_DLL:
             active_flight_cards.controls.append(flight_card.flight_as_card)
         for flight_card in FLOWN_FLIGHTS_DLL:
@@ -63,9 +93,6 @@ def main(page):
     for i in range(1, random.randint(3, 5)):
         FLOWN_FLIGHTS_DLL.append(FlightCard(ACTIVE_FLIGHTS_DLL, CANCELED_FLIGHTS_DLL, FLOWN_FLIGHTS_DLL, return_page=return_page, refresh_page=handle_refresh_page))
 
-    print(len(ACTIVE_FLIGHTS_DLL))
-    print(len(CANCELED_FLIGHTS_DLL))
-    print(len(FLOWN_FLIGHTS_DLL))
     page.theme_mode = 'dark'
     def handle_date_change(e):
         # print(f"date value = {departure_date.value}")
@@ -97,9 +124,6 @@ def main(page):
     departure_date = ft.DatePicker(on_change=handle_date_change)
     departure_time = ft.TimePicker(on_change=handle_time_change)
 
-    def add_elements_to_page():
-        page.overlay.append(departure_date)
-        page.overlay.append(departure_time)
     page.overlay.append(departure_date)
     page.overlay.append(departure_time)
 
@@ -175,8 +199,7 @@ def main(page):
     # ------------------------  EVENT TRIGGER FUNCTIONS  ------------------------------------------------
 
     def handle_change(e):
-        print(f"handle_change e.data: {e.data}")
-
+        print(f"handle change e.data: {e.data}")
     def handle_submit(e):
         print(f"handle_submit e.data: {e.data}")
 
@@ -298,7 +321,7 @@ def main(page):
 
     search_bar = ft.SearchBar(
         view_elevation=4,
-        width=200,
+        width=400,
         height=40,
         divider_color=ft.colors.AMBER,
         bar_hint_text="Search flights",
@@ -319,20 +342,52 @@ def main(page):
                 text="Delete Flights",
                 on_click=delete_flights
             ),
+        ],
+    )
+
+    user_profile = ft.PopupMenuButton(
+        content=ft.CircleAvatar(
+        foreground_image_url=user.profile_image_url,
+        content=ft.Text("FF"),
+        ),
+        items=[
+            ft.PopupMenuItem(
+                content=ft.Container(
+                content=theme_toggle,
+                        padding=ft.Padding(10,0,0,0),
+                ),
+            ),
+            ft.PopupMenuItem(text="Refresh"),
 
             ft.PopupMenuItem(
                 icon=ft.icons.BAR_CHART,
                 text="Charts",
                 on_click=lambda _: graphs.draw(page, refresh_page = home_page)
                ),
+            ft.PopupMenuItem(
+                icon=ft.icons.LOGOUT,
+                text="Log out",
+                on_click=lambda _: page.window_close()
+            ),
         ],
     )
 
-    nav_bar = ft.Row(controls=[
-        theme_toggle,
-        search_bar,
-        add_button,
-        filter_button
+    nav_bar = ft.ResponsiveRow(controls=[
+        ft.Row(controls=[
+            search_bar,
+            add_button,
+            filter_button,
+        ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            col={"sm": 11, "md": 11, "xl": 11}
+
+        ),
+        ft.Row(controls=[
+            user_profile,
+        ],
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+            col={"sm": 1, "md": 1, "xl": 1},
+        )
     ],
         alignment=ft.MainAxisAlignment.CENTER,
     )
@@ -378,11 +433,10 @@ def main(page):
         flight_card = flight.flight_as_card
         flown_flight_cards.controls.append(flight_card)
     canceled_flight_cards.controls.append(
-        ft.Text("Canceled Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
+        ft.Text("Cancelled Flights", weight=ft.FontWeight.W_400, size=18, text_align=ft.TextAlign.CENTER))
     for flight in CANCELED_FLIGHTS_DLL:
         flight_card = flight.flight_as_card
         canceled_flight_cards.controls.append(flight_card)
-
     all_cards_wrapper_row = ft.ResponsiveRow(
         [
             active_flight_cards,
@@ -398,9 +452,8 @@ def main(page):
         wrapper.controls.append(all_cards_wrapper_row)
         page.add(wrapper)
         update_search_bar()
-
     home_page()
-
+    handle_refresh_page(e=None)
 
 
 # Start the app

@@ -23,7 +23,6 @@ class FlightCard:
         self.flight_as_card = self.create_flight_card()
         self.prev = None
         self.next = None
-
     def delete_flight(self, e):
         if self in self.active_flight_dll:
             self.active_flight_dll.delete(self)
@@ -33,7 +32,10 @@ class FlightCard:
         elif self in self.flown_flights_dll:
             self.flown_flights_dll.delete(self)
         else:
-            self.canceled_flights_dll(self)
+            self.canceled_flights_dll.delete(self)
+            deleted_flight = self
+            deleted_flight.prev = deleted_flight.next = None
+            self.active_flight_dll.append(deleted_flight)
         self.refresh_page(e=None)
 
     def delete_flight_card(self):
@@ -84,15 +86,19 @@ class FlightCard:
                 ),  # end card
                 # ----------------dismissible props
                 dismiss_direction=ft.DismissDirection.HORIZONTAL,
-                background=ft.Container(bgcolor=ft.colors.GREEN),
+                background=ft.Container(bgcolor=ft.colors.RED),
                 secondary_background=ft.Container(bgcolor=ft.colors.RED),
                 on_dismiss=self.delete_flight,
-                #on_update=self.update_card,
+                # on_update=self.update_card
                 dismiss_thresholds={
                     ft.DismissDirection.END_TO_START: 0.2,
                     ft.DismissDirection.START_TO_END: 0.2,
                 },
             )
+            if self in self.canceled_flights_dll:
+                card.background=ft.Container(bgcolor=ft.colors.GREEN)
+                card.secondary_background=ft.Container(bgcolor=ft.colors.GREEN)
+
         elif self.__editable == None:
             card = ft.Dismissible(
                 key=self.__id,

@@ -114,7 +114,7 @@ def draw_delayal_filter_by_state():
 
     # Create a color map based on the number of unique reasons
     unique_reasons = df_to_counts_sorted['reason'].unique()
-    color_map = plt.cm.get_cmap('tab20', len(unique_reasons))  # Choose a colormap
+    color_map = plt.get_cmap('tab20', len(unique_reasons))  # Choose a colormap
 
     # Assign a color index to each reason
     color_dict = {reason: color_map(i) for i, reason in enumerate(unique_reasons)}
@@ -169,7 +169,7 @@ def draw_flights_per_month():
 
     # Create a bar chart using Matplotlib
     fig, ax = plt.subplots()
-    ax.bar(df_month['month'], df_month['count'], color='#636EFA')
+    ax.bar(df_month['createdAt'], df_month['count'], color='#636EFA')
 
     # Set labels and title
     ax.set_xlabel('Month')
@@ -189,7 +189,7 @@ def draw_flights_per_year():
     df_year = df_filtered['createdAt'].dt.year.value_counts().reset_index(name='count').rename(columns={'index': 'year'})
     # Create a bar chart using Matplotlib
     fig, ax = plt.subplots()
-    ax.bar(df_year['year'], df_year['count'], color='#636EFA')
+    ax.bar(df_year['createdAt'], df_year['count'], color='#636EFA')
 
     # Set labels and title
     ax.set_xlabel('Year')

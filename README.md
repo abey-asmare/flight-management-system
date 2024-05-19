@@ -27,6 +27,14 @@ cd flight-management-system
 pip install -r requirements.txt
 ```
 
+4. Create a .env file
+
+```commandline
+    create a dot env file and add your google and github 
+     client_id and client_secrets into a .env file
+     the teimplate is provided in the .env_example file
+    
+```
 
 ## Usage
 Run the main script to start the application:
